@@ -6,6 +6,8 @@ This repository hosts [[https://srfi.schemers.org/srfi-158/][SRFI 158]]: Generat
 
 This SRFI is in /draft/ status.
 
+See also [[https://srfi.schemers.org/srfi-121/][SRFI 121: Generators]].
+
 The full documentation for this SRFI can be found in the [[https://srfi.schemers.org/srfi-158/srfi-158.html][SRFI Document]].
 
 If you'd like to participate in the discussion of this SRFI, or report issues with it, please [[shttp://srfi.schemers.org/srfi-158/][join the SRFI-158 mailing list]] and send your message there.
