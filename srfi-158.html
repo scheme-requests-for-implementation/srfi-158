@@ -17,17 +17,12 @@ Shiro Kawai, John Cowan, Thomas Gilray
 
 <h1>Status</h1>
 
-This SRFI is currently in ``draft'' status.
-To see an explanation of
-each status that a SRFI can hold, see <a href="http://srfi.schemers.org/srfi-process.html">here</a>.
-
-To provide input on this SRFI, please
-<a href="mailto:srfi minus 158 at srfi dot schemers dot org">mail to
-<code>&lt;srfi minus 158 at srfi dot schemers dot org&gt;</code></a>.  See
-<a href="http://srfi.schemers.org/srfi-list-subscribe.html">instructions here</a> to
-subscribe to the list.  You can access previous messages via
-<a href="http://srfi.schemers.org/srfi-158/mail-archive/maillist.html">the archive of the mailing list</a>.
-</p>
+<p>This SRFI is currently in <em>draft</em> status.  Here is <a href="https://srfi.schemers.org/srfi-process.html">an explanation</a> of each status that a SRFI can hold.  To provide input on this SRFI, please send email to <code><a href="mailto:srfi+minus+158+at+srfi+dotschemers+dot+org">srfi-158@<span class="antispam">nospam</span>srfi.schemers.org</a></code>.  To subscribe to the list, follow <a href="https://srfi.schemers.org/srfi-list-subscribe.html">these instructions</a>.  You can access previous messages via the mailing list <a href="https://srfi-email.schemers.org/srfi-158">archive</a>.</p>
+<ul>
+  <li>Received: 2017/8/11</li>
+  <li>60-day deadline: 2017/10/11</li>
+  <li>Draft #1 published: 2017/8/12</li>
+</ul>
 
 <h1>Abstract</h1>
 
@@ -141,7 +136,7 @@ This SRFI differs from SRFI 121 by restoring the generator constructor
 <code>make-circular-generator</code> and the generator operations 
 <code>gflatten</code>, <code>ggroup</code>, <code>gmerge</code>, <code>gmap</code>,
 and <code>gstate-filter</code> from <code>gauche.generator</code>.
-It also adds the definition of accumulators and and some accumulator constructors.
+It also adds the definition of accumulators and some accumulator constructors.
 
 <h1>Specification</h1>
 
@@ -402,7 +397,7 @@ generator.
 <dt><code>ggroup</code><i> gen k [ padding ]</i></dt>
 <dd><p>Returns a generator that yields lists of <i>k</i> items from the given
 generator.
-If less than <i>k</i> elements are available for the last list, and <i>padding</i>
+If fewer than <i>k</i> elements are available for the last list, and <i>padding</i>
 is absent, the short list is returned; otherwise, it is padded by <i>padding</i>
 to length <i>k</i>.
 </p>
@@ -466,7 +461,7 @@ except those on which <var>pred</var> answers false or true respectively.
 <dl>
 <dt><code>gstate-filter</code><i> proc gen seed</i></dt>
 <dd><p>Returns a generator that obtains items from the source generator
-and passes an item and a state (whose initial value is <i>seed</i> as
+and passes an item and a state (whose initial value is <i>seed</i>) as
 arguments to <i>proc</i>.  <i>Proc</i> in turn returns two values,
 a boolean and a new value of the state.  If the boolean is true,
 the item is returned; otherwise, this algorithm is repeated until
