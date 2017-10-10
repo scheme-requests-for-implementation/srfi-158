@@ -48,13 +48,8 @@ that works as a sink of values.
 
 <p>2. Should we allow accumulators to discard their state after returning it?
 This would mean that it is not possible to keep passing an end-of-file
-object to obtain the state multiple times.</p>
+object to obtain the finalized state multiple times.</p>
 
-<p>3. Should there be <code>unfold-accumulator</code> in the spirit of
-<code>generator-unfold</code>?  This would accept an
-unfold procedure and push successive arguments into it that are unfolded
-into a list, string, or whatever collection type the unfold procedure returns.
-</p>
 
 <h1>Rationale</h1>
 
@@ -121,9 +116,9 @@ collection that has a for-each procedure into any collection that has
 an unfold constructor.  This generalizes such conversion procedures as
 <code>list-&gt;vector</code> and <code>string-&gt;list</code>.</p>
 
-<p>These procedures are drawn from the Gauche core and the Gauche
-module <code>gauche.generator</code>, with
-some renaming to make them more systematic, and with a few additions
+<p>These procedures are drawn from the Gauche core and the Gauche module
+<a href="http://practical-scheme.net/gauche/man/gauche-refe/Generators.html"><code>gauche.generator</code></a>
+with some renaming to make them more systematic, and with a few additions
 from the Python library
 <a href="https://docs.python.org/3/library/itertools.html"><code>itertools</code></a>.
 Consequently, Shiro Kawai,
@@ -133,10 +128,13 @@ provided the sample implementation and a valuable critique of the SRFI.
 Special acknowledgements to Kragen Javier Sitaker for his extensive review.</p>
 
 This SRFI differs from SRFI 121 by restoring the generator constructor
-<code>make-circular-generator</code> and the generator operations 
-<code>gflatten</code>, <code>ggroup</code>, <code>gmerge</code>, <code>gmap</code>,
-and <code>gstate-filter</code> from <code>gauche.generator</code>.
-It also adds the definition of accumulators and some accumulator constructors.
+<code>circular-generator</code> and the generator operations 
+<code>gflatten</code>, <code>ggroup</code>, <code>gmerge</code>,
+<code>gmap</code>,
+<code>gstate-filter</code>, and <code>generator-map->list</code>
+from <code>gauche.generator</code>,
+as well as the new <code>gpath</code> operation.
+It also adds the definition of accumulators and and some accumulator constructors.
 
 <h1>Specification</h1>
 
@@ -405,9 +403,10 @@ to length <i>k</i>.
 
 <dl>
 <dl>
-<dt><code>gmerge</code><i> less-than gen<sub>1</sub> gen<sub>2</sub></i></dt>
+<dt><code>gmerge</code><i> less-than genleft genright</i></dt>
 <dd><p>Returns a generator that yields the items from the given
 generators in the order dictated by <i>less-than</i>.
+If the items are equal, the left item is used first.
 When both given generators are exhausted, the returned generator
 is exhausted also.
 </p>
@@ -420,7 +419,7 @@ is exhausted also.
 generator after invoking <i>proc</i> on them.
 </p>
 <p>
-Note: This differs from <code>generator-map</code>,
+Note: This differs from <code>generator-map->list</code>,
 which consumes all values at once and returns the results as a list,
 while <code>gmap</code> returns a generator immediately without consuming input.
 </p>
@@ -459,14 +458,14 @@ except those on which <var>pred</var> answers false or true respectively.
 </p></dd></dl>
 
 <dl>
-<dt><code>gstate-filter</code><i> proc gen seed</i></dt>
+<dt><code>gstate-filter</code><i> proc seed gen</i></dt>
 <dd><p>Returns a generator that obtains items from the source generator
 and passes an item and a state (whose initial value is <i>seed</i>) as
 arguments to <i>proc</i>.  <i>Proc</i> in turn returns two values,
 a boolean and a new value of the state.  If the boolean is true,
 the item is returned; otherwise, this algorithm is repeated until
 <i>gen</i> is exhausted, at which point the returned generator is also
-exhausted.  The final value of the seed is discarded.
+exhausted.  The final value of the state is discarded.
 </p></dd></dl>
 
 
@@ -551,6 +550,21 @@ is exhausted, at which time the other is in an undefined state.
                           (list-&gt;generator '(#t #f #f #t #t #f))))
   ⇒ (a d e)
 </pre></td></tr></tbody></table>
+</dd></dl>
+
+<dt><code>gpath</code><i> gen component</i> ...</dt>
+<dd><p>A <i>component</i> is a generator operation that accepts only a single
+argument, a generator, and returns a generator whose behavior is related to the
+argument in some fashion.  
+Typically this will be a lambda expression referencing one of the standard
+operations described in this section.</p>
+
+<p>The <code>gpath</code> procedure applies
+the first <i>component</i> to <i>gen</i>, and then applies the
+result to the second <i>component</i>, and so on
+until there are no more components, when the result of the final application
+is returned.
+</p>
 </dd></dl>
 
 
@@ -642,10 +656,20 @@ generators is exhausted, at which time all the others are in an undefined state.
 <dd><p>A generator analogue of <code>for-each</code> that consumes generated values using side effects.
 Repeatedly applies <var>proc</var> on
 the values yielded by <var>gen</var>, <var>gen<sub>2</sub></var> … until any one of
-the generators is exhausted.  The values returned from <var>proc</var> are discarded.
-The procedure terminates when any of the <i>gen<sub>n</sub></i>
-generators is exhausted, at which time all the others are in an undefined state.
+the generators is exhausted, at which time all the others are in an undefined state.
+The values returned from <var>proc</var> are discarded.
 Returns an unspecified value.
+</p></dd></dl>
+
+<dl>
+<dt><code>generator-map->list</code><i> proc gen gen<sub>2</sub> …</i></dt>
+<dd><p>A generator analogue of <code>map</code> that consumes generated values,
+processes them through a mapping function, and returns a list of the mapped values.
+Repeatedly applies <var>proc</var> on
+the values yielded by <var>gen</var>, <var>gen<sub>2</sub></var> … until any one of
+the generators is exhausted, at which time all the others are in an undefined state.
+The values returned from <var>proc</var> are
+accumulated into a list, which is returned.
 </p></dd></dl>
 
 
@@ -708,14 +732,27 @@ to the result.
 
 <h2 class="subsection">Accumulator constructors</h2>
 
-<p>These procedures have names ending with <code>accumulator</code>.</p>
+<p>These procedures have names ending with <code>accumulator</code>.
+
+<dl>
+<dt><code>make-accumulator</code><i> kons knil finalizer</i></dt>
+<dd><p>Returns an accumulator that, when invoked on an object
+other than an end-of-file object, invokes <i>kons</i> on its
+argument and the accumulator's current state, using the same order
+as a function passed to <code>fold</code>.  It then sets the accumulator's state
+to the value returned by <i>kons</i> and returns an unspecified value.
+The initial state of the accumulator is set
+to <i>knil</i>.  
+However, if an end-of-file object is passed to the accumulator, it returns the
+state after passing it through the procedure <i>finalizer</i>.
+</p></dd></dl>
 
 <dl>
 <dt><code>count-accumulator</code></dt>
 <dd><p>Returns an accumulator that, when invoked on an object,
-adds 1 to a sum inside the accumulator
+adds 1 to a count inside the accumulator
 and returns an unspecified value.
-However, if an end-of-file object is passed, the accumulator returns the sum.
+However, if an end-of-file object is passed, the accumulator returns the count.
 </p></dd></dl>
 
 <dl>
@@ -735,23 +772,19 @@ However, if an end-of-file object is passed, the accumulator returns the list.
 </p></dd></dl>
 
 <dl>
-<dt><code>vector-accumulator</code><i> [ n obj ]</i></dt>
+<dt><code>vector-accumulator</code></dt>
 <dd><p>Returns an accumulator that, when invoked on an object,
 adds that object to a vector inside the accumulator in order of
 accumulation and returns an unspecified value.
 However, if an end-of-file object is passed, the accumulator returns the vector.
-If <i>n</i> is supplied, the vector is created with length <i>n</i> and filled with <i>obj</i>,
-and it is an error to attempt to accumulate more than <i>n</i> objects.
 </p></dd></dl>
 
 <dl>
-<dt><code>reverse-vector-accumulator</code><i> [ n obj ]</i></dt>
+<dt><code>reverse-vector-accumulator</code></dt>
 <dd><p>Returns an accumulator that, when invoked on an object,
 adds that object to a vector inside the accumulator in reverse order of
 accumulation and returns an unspecified value.
 However, if an end-of-file object is passed, the accumulator returns the vector.
-If <i>n</i> is supplied, the vector is created with length <i>n</i> and filled with <i>obj</i>,
-and it is an error to attempt to accumulate more than <i>n</i> objects.
 </p></dd></dl>
 
 <dl>
@@ -765,39 +798,65 @@ However, if an end-of-file object is passed, the accumulator returns <i>vector</
 </p></dd></dl>
 
 <dl>
-<dt><code>string-accumulator</code><i> [ n char ]</i></dt>
-<dd><p>Returns an accumulator that, when invoked on a character,
-adds that character to a string inside the accumulator in order of
+<dt><code>list-accumulator</code></dt>
+<dd><p>Returns an accumulator that, when invoked on an object,
+adds that object to a list inside the accumulator in order of
 accumulation and returns an unspecified value.
-If <i>n</i> is supplied, the string is created with length <i>n</i> and filled with <i>char</i>,
-and it is an error to attempt to accumulate more than <i>n</i> characters.
-If <i>n</i> is supplied, it is an error to attempt to accumulate more than <i>n</i>
-characters.
 However, if an end-of-file object is passed, the accumulator returns the list.
 </p></dd></dl>
 
 <dl>
-<dt><code>bytevector-accumulator</code><i> [ n byte ]</i></dt>
+<dt><code>reverse-list-accumulator</code></dt>
+<dd><p>Returns an accumulator that, when invoked on an object,
+adds that object to a list inside the accumulator in reverse order of
+accumulation and returns an unspecified value.
+However, if an end-of-file object is passed, the accumulator returns the list.
+</p></dd></dl>
+
+<dl>
+<dt><code>vector-accumulator</code></dt>
+<dd><p>Returns an accumulator that, when invoked on an object,
+adds that object to a vector inside the accumulator in order of
+accumulation and returns an unspecified value.
+However, if an end-of-file object is passed, the accumulator returns the vector.
+</p></dd></dl>
+
+<dl>
+<dt><code>reverse-vector-accumulator</code></dt>
+<dd><p>Returns an accumulator that, when invoked on an object,
+adds that object to a vector inside the accumulator in reverse order of
+accumulation and returns an unspecified value.
+However, if an end-of-file object is passed, the accumulator returns the vector.
+</p></dd></dl>
+
+<dl>
+<dt><code>vector-accumulator!</code><i> vector at</i></dt>
+<dd><p>Returns an accumulator that, when invoked on an object,
+adds that object to consecutive positions of <i>vector</i> starting
+at <i>at</i> in order of
+accumulation.  It is an error to try to accumulate more objects than
+<i>vector</i> will hold.  An unspecified value is returned.
+However, if an end-of-file object is passed, the accumulator returns <i>vector</i>.
+</p></dd></dl>
+
+<dl>
+<dt><code>string-accumulator</code></dt>
+<dd><p>Returns an accumulator that, when invoked on a character,
+adds that character to a string inside the accumulator in order of
+accumulation and returns an unspecified value.
+However, if an end-of-file object is passed, the accumulator returns the string.
+</p></dd></dl>
+
+<dl>
+<dt><code>bytevector-accumulator</code></dt>
 <dd><p>Returns an accumulator that, when invoked on a byte,
 adds that integer to a bytevector inside the accumulator in order of
 accumulation and returns an unspecified value.
 However, if an end-of-file object is passed, the accumulator returns the bytevector.
-If <i>n</i> is supplied, the bytevector is created at length <i>n</i> and filled with <i>byte</i>,
-and it is an error to attempt to accumulate more than <i>n</i> bytes.
 </p></dd></dl>
 
 <dl>
-<dt><code>reverse-bytevector-accumulator</code><i> [ n byte ]</i></dt>
-<dd><p>Returns an accumulator that, when invoked on a byte,
-adds that byte to a bytevector inside the accumulator in reverse order of
-accumulation and returns an unspecified value.
-However, if an end-of-file object is passed, the accumulator returns the bytevector.
-If <i>n</i> is supplied, the bytevector is created with length <i>n</i> and filled with <i>byte</i>,
-and it is an error to attempt to accumulate more than <i>n</i> bytes.
-</p></dd></dl>
-
-<dl>
-<dt><code>sum-accumulator</code></dt>
+<dt><code>sum-accumulator</code> </dt>
 <dd><p>Returns an accumulator that, when invoked on a number,
 adds that number to a sum inside the accumulator in order of
 accumulation and returns an unspecified value.
@@ -805,7 +864,7 @@ However, if an end-of-file object is passed, the accumulator returns the sum.
 </p></dd></dl>
 
 <dl>
-<dt><code>product-accumulator</code></dt>
+<dt><code>product-accumulator</code> </dt>
 <dd><p>Returns an accumulator that, when invoked on a number,
 multiplies that number to a product inside the accumulator in order of
 accumulation and returns an unspecified value.
@@ -814,14 +873,14 @@ However, if an end-of-file object is passed, the accumulator returns the product
 
 <h1>Implementation</h1>
 
-<p>The sample implementation is (not yet) in the SRFI 158 repository.  It contains the following files:</p>
+<p>The sample implementation is in the SRFI 158 repository.  It contains the following files:</p>
 
 <ul>
-<li><code>generators-impl.scm</code> - implementation of generators</li>
+<li><code>srfi-158-impl.scm</code> - implementation of generators</li>
 <li><code>r7rs-shim.scm</code> - supplementary code for non-R7RS systems</li>
-<li><code>generators.sld</code> - R7RS library</li>
-<li><code>generators.scm</code> - Chicken library</li>
-<li><code>generators-test.scm</code> - Chicken test-egg test file</li>
+<li><code>srfi-158.sld</code> - R7RS library</li>
+<li><code>srfi-158.scm</code> - Chicken library</li>
+<li><code>chicken-test.scm</code> - Chicken test-egg test file</li>
 </ul>
 
 <h1>Copyright</h1>
