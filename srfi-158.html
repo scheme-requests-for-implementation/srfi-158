@@ -290,10 +290,6 @@ is the <var>start</var>-th element, and it ends right before the <var>end</var>-
 </dd></dl>
 
 <dl>
-
-</p></dd></dl>
-
-<dl>
 <dt><code>make-for-each-generator</code><i> for-each obj</i></dt>
 <dd><p>A generator constructor that converts any collection <var>obj</var> to
 a generator that returns its elements using a
@@ -369,7 +365,6 @@ tail-call <var>gen</var>.
 </dd></dl>
 
 <dl>
-<dl>
 <dt><code>gappend</code><i> gen …</i></dt>
 <dd><p>Returns a generator that yields the items from the first given
 generator, and once it is exhausted, from the second generator, and so on.
@@ -383,14 +378,12 @@ generator, and once it is exhausted, from the second generator, and so on.
 </dd></dl>
 
 <dl>
-<dl>
 <dt><code>gflatten</code><i> gen</i></dt>
 <dd><p>Returns a generator that yields the elements of the lists produced by the given
 generator.
 </p>
 </dd></dl>
 
-<dl>
 <dl>
 <dt><code>ggroup</code><i> gen k [ padding ]</i></dt>
 <dd><p>Returns a generator that yields lists of <i>k</i> items from the given
@@ -402,7 +395,6 @@ to length <i>k</i>.
 </dd></dl>
 
 <dl>
-<dl>
 <dt><code>gmerge</code><i> less-than genleft genright</i></dt>
 <dd><p>Returns a generator that yields the items from the given
 generators in the order dictated by <i>less-than</i>.
@@ -412,7 +404,6 @@ is exhausted also.
 </p>
 </dd></dl>
 
-<dl>
 <dl>
 <dt><code>gmap</code><i> proc gen</i></dt>
 <dd><p>Returns a generator that yields the items from the given
@@ -432,7 +423,6 @@ while <code>gmap</code> returns a generator immediately without consuming input.
 </pre></td></tr></tbody></table>
 </dd></dl>
 
-<dl>
 <dl>
 <dt><code>gcombine</code><i> proc seed gen gen<sub>2</sub> …</i></dt>
 <dd><p>A generator for
@@ -550,7 +540,7 @@ is exhausted, at which time the other is in an undefined state.
                           (list-&gt;generator '(#t #f #f #t #t #f))))
   ⇒ (a d e)
 </pre></td></tr></tbody></table>
-</dd></dl>
+</dd>
 
 <dt><code>gpath</code><i> gen component</i> ...</dt>
 <dd><p>A <i>component</i> is a generator operation that accepts only a single
