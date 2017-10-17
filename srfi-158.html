@@ -396,19 +396,28 @@ to length <i>k</i>.
 </dd></dl>
 
 <dl>
-<dt><code>gmerge</code><i> less-than genleft genright</i></dt>
+<dt><code>gmerge</code><i> less-than gen1 gen2 ...</i></dt>
 <dd><p>Returns a generator that yields the items from the given
 generators in the order dictated by <i>less-than</i>.
-If the items are equal, the left item is used first.
-When both given generators are exhausted, the returned generator
+If the items are equal, the leftmost item is used first.
+When all of given generators are exhausted, the returned generator
 is exhausted also.
+</p>
+<p>
+As a special case, if only one generator is given, it is returned.
 </p>
 </dd></dl>
 
 <dl>
-<dt><code>gmap</code><i> proc gen</i></dt>
-<dd><p>Returns a generator that yields the items from the given
+<dt><code>gmap</code><i> proc gen1 gen2 ...</i></dt>
+<dd><p>When only one generator is given,
+returns a generator that yields the items from the given
 generator after invoking <i>proc</i> on them.
+</p>
+<p>When more than one generator is given, each item of the resulting
+generator is a result of applying <i>proc</i> on the items from
+each generators.  If any of input generator is exhausted, the resulting
+generator is also exhausted.
 </p>
 <p>
 Note: This differs from <code>generator-map->list</code>,
@@ -419,8 +428,8 @@ while <code>gmap</code> returns a generator immediately without consuming input.
 <table><tbody><tr><td>&nbsp;</td><td><pre class="example">(generator-&gt;list (gmap - (make-range-generator 0 3)))
  ⇒ (0 -1 -2)
 
-(generator-&gt;list (gappend))
- ⇒ ()
+(generator-&gt;list (gmap cons (generator 1 2 3) (generator 4 5)))
+ ⇒ ((1 . 4) (2 . 5))
 </pre></td></tr></tbody></table>
 </dd></dl>
 

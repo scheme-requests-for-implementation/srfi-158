@@ -7,7 +7,7 @@
 
 ;; list->bytevector
 (define (list->bytevector list)
-  (let ((vec (make-bytevector (length list) #f)))
+  (let ((vec (make-bytevector (length list) 0)))
     (let loop ((i 0) (list list))
       (if (null? list)
         vec
@@ -222,28 +222,46 @@
               (append item (make-list (- k len) padding))))))))
 
 ;; gmerge
-(define (gmerge < genleft genright)
-  (let ((left (genleft))
-        (right (genright)))
-    (lambda ()
-      (cond
-        ((and (eof-object? left) (eof-object? right))
-         left)
-        ((eof-object? left)
-         (let ((obj right)) (set! right (genright)) obj))
-        ((eof-object? right)
-         (let ((obj left))  (set! left (genleft)) obj))
-        ((< right left)
-         (let ((obj right)) (set! right (genright)) obj))
-        (else
-          (let ((obj left)) (set! left (genleft)) obj))))))
-
+(define gmerge
+  (case-lambda
+    ((<) (error "wrong number of arguments for gmerge"))
+    ((< gen) gen)
+    ((< genleft genright)
+     (let ((left (genleft))
+           (right (genright)))
+       (lambda ()
+         (cond
+          ((and (eof-object? left) (eof-object? right))
+           left)
+          ((eof-object? left)
+           (let ((obj right)) (set! right (genright)) obj))
+          ((eof-object? right)
+           (let ((obj left))  (set! left (genleft)) obj))
+          ((< right left)
+           (let ((obj right)) (set! right (genright)) obj))
+          (else
+           (let ((obj left)) (set! left (genleft)) obj))))))
+    ((< . gens)
+     (apply gmerge <
+            (let loop ((gens gens) (gs '()))
+              (cond ((null? gens) (reverse gs))
+                    ((null? (cdr gens)) (reverse (cons (car gens) gs)))
+                    (else (loop (cddr gens)
+                                (cons (gmerge < (car gens) (cadr gens)) gs)))))))))
+    
 ;; gmap
-(define (gmap proc gen)
-  (lambda ()
-    (let ((item (gen)))
-      (if (eof-object? item) item (proc item)))))
-
+(define gmap
+  (case-lambda
+    ((proc) (error "wrong number of arguments for gmap"))
+    ((proc gen)
+     (lambda ()
+       (let ((item (gen)))
+         (if (eof-object? item) item (proc item)))))
+    ((proc . gens)
+     (lambda ()
+       (let ((items (map (lambda (x) (x)) gens)))
+         (if (any eof-object? items) (eof-object) (apply proc items)))))))
+    
 ;; gcombine
 (define (gcombine proc seed . gens)
   (lambda ()
