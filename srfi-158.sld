@@ -17,7 +17,7 @@
   (export make-accumulator count-accumulator list-accumulator
           reverse-list-accumulator vector-accumulator
           reverse-vector-accumulator vector-accumulator!
-          string-accumulator bytevector-accumulator
+          string-accumulator bytevector-accumulator bytevector-accumulator!
           sum-accumulator product-accumulator)
   (include "srfi-158-impl.scm")
 )

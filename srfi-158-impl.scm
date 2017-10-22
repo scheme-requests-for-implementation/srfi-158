@@ -7,7 +7,7 @@
 
 ;; list->bytevector
 (define (list->bytevector list)
-  (let ((vec (make-bytevector (length list) #f)))
+  (let ((vec (make-bytevector (length list) 0)))
     (let loop ((i 0) (list list))
       (if (null? list)
         vec
@@ -222,28 +222,46 @@
               (append item (make-list (- k len) padding))))))))
 
 ;; gmerge
-(define (gmerge < genleft genright)
-  (let ((left (genleft))
-        (right (genright)))
-    (lambda ()
-      (cond
-        ((and (eof-object? left) (eof-object? right))
-         left)
-        ((eof-object? left)
-         (let ((obj right)) (set! right (genright)) obj))
-        ((eof-object? right)
-         (let ((obj left))  (set! left (genleft)) obj))
-        ((< right left)
-         (let ((obj right)) (set! right (genright)) obj))
-        (else
-          (let ((obj left)) (set! left (genleft)) obj))))))
-
+(define gmerge
+  (case-lambda
+    ((<) (error "wrong number of arguments for gmerge"))
+    ((< gen) gen)
+    ((< genleft genright)
+     (let ((left (genleft))
+           (right (genright)))
+       (lambda ()
+         (cond
+          ((and (eof-object? left) (eof-object? right))
+           left)
+          ((eof-object? left)
+           (let ((obj right)) (set! right (genright)) obj))
+          ((eof-object? right)
+           (let ((obj left))  (set! left (genleft)) obj))
+          ((< right left)
+           (let ((obj right)) (set! right (genright)) obj))
+          (else
+           (let ((obj left)) (set! left (genleft)) obj))))))
+    ((< . gens)
+     (apply gmerge <
+            (let loop ((gens gens) (gs '()))
+              (cond ((null? gens) (reverse gs))
+                    ((null? (cdr gens)) (reverse (cons (car gens) gs)))
+                    (else (loop (cddr gens)
+                                (cons (gmerge < (car gens) (cadr gens)) gs)))))))))
+    
 ;; gmap
-(define (gmap proc gen)
-  (lambda ()
-    (let ((item (gen)))
-      (if (eof-object? item) item (proc item)))))
-
+(define gmap
+  (case-lambda
+    ((proc) (error "wrong number of arguments for gmap"))
+    ((proc gen)
+     (lambda ()
+       (let ((item (gen)))
+         (if (eof-object? item) item (proc item)))))
+    ((proc . gens)
+     (lambda ()
+       (let ((items (map (lambda (x) (x)) gens)))
+         (if (any eof-object? items) (eof-object) (apply proc items)))))))
+    
 ;; gcombine
 (define (gcombine proc seed . gens)
   (lambda ()
@@ -531,33 +549,12 @@
 (define (reverse-list-accumulator) (make-accumulator cons '() (lambda (x) x)))
 
 ;; vector-accumulator
-(define vector-accumulator
-  (case-lambda
-    (()
-      (make-accumulator cons '() (lambda (x) (list->vector (reverse x)))))
-    ((n fill)
-      (let ((vec (make-vector n fill))
-            (i 0))
-        (lambda (obj)
-          (if (eof-object? obj)
-            vec
-            (begin
-              (vector-set! vec i obj)
-              (set! i (+ 1 i)))))))))
+(define (vector-accumulator)
+  (make-accumulator cons '() (lambda (x) (list->vector (reverse x)))))
 
 ;; reverse-vector-accumulator
-(define reverse-vector-accumulator
-  (case-lambda
-    (()
-      (make-accumulator cons '() list->vector))
-    ((n fill)
-      (let ((vec (make-vector n fill)))
-        (lambda (obj)
-          (if (eof-object? obj)
-            vec
-            (begin
-              (vector-set! vec n obj)
-              (set! n (+ 1 n)))))))))
+(define (reverse-vector-accumulator)
+  (make-accumulator cons '() list->vector))
 
 ;; vector-accumulator!
 (define (vector-accumulator! vec at)
@@ -569,35 +566,21 @@
         (set! at (+ at 1))))))
 
 ;; bytevector-accumulator
-(define bytevector-accumulator
-  (case-lambda
-    (()
-     (make-accumulator cons '() (lambda (x) (list->bytevector (reverse x)))))
-    ((n fill)
-      (let ((bv (make-bytevector n fill))
-            (i 0))
-        (lambda (byte)
-          (if (eof-object? byte)
-            bv
-            (begin
-              (bytevector-u8-set! bv i byte)
-              (set! i (+ 1 i)))))))))
+(define (bytevector-accumulator)
+  (make-accumulator cons '() (lambda (x) (list->bytevector (reverse x)))))
+
+(define (bytevector-accumulator! bytevec at)
+  (lambda (obj)
+    (if (eof-object? obj)
+      bytevec
+      (begin
+        (bytevector-u8-set! bytevec at obj)
+        (set! at (+ at 1))))))
 
 ;; string-accumulator
-(define string-accumulator
-  (case-lambda
-    (()
-      (make-accumulator cons '()
+(define (string-accumulator)
+  (make-accumulator cons '()
         (lambda (lst) (list->string (reverse lst)))))
-    ((n fill)
-      (let ((str (make-string n fill))
-            (i 0))
-        (lambda (char)
-          (if (eof-object? char)
-            str
-            (begin
-              (string-set! str i char)
-              (set! i (+ 1 i)))))))))
 
 ;; sum-accumulator
 (define (sum-accumulator) (make-accumulator + 0 (lambda (x) x)))

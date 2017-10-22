@@ -2,7 +2,7 @@
   (import scheme)
   ;; Provide necessary R7RS-small identifiers
   (import (only chicken
-            use include case-lambda call/cc when
+            use include case-lambda call/cc when error
             let-values define-values open-input-string))
   (use (only srfi-4 make-u8vector u8vector u8vector-ref
              u8vector-set! u8vector-length))
@@ -22,7 +22,7 @@
   (export make-accumulator count-accumulator list-accumulator
           reverse-list-accumulator vector-accumulator
           reverse-vector-accumulator vector-accumulator!
-          string-accumulator bytevector-accumulator
+          string-accumulator bytevector-accumulator bytevector-accumulator!
           sum-accumulator product-accumulator)
   (include "r7rs-shim.scm")
   (include "srfi-158-impl.scm")
