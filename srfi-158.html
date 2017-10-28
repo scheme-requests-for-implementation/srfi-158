@@ -44,13 +44,6 @@ An accumulator is the inverse of a generator:  it is a procedure of one argument
 that works as a sink of values.
 </p>
 
-<h1>Issues</h1>
-
-<p>1. Should we allow accumulators to discard their state after returning it?
-This would mean that it is not possible to keep passing an end-of-file
-object to obtain the finalized state multiple times.</p>
-
-
 <h1>Rationale</h1>
 
 <p>The main purpose of generators is high performance.  Although
