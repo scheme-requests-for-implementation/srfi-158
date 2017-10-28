@@ -147,13 +147,13 @@ By definition, infinite generators can never be exhausted.</p>
 <p>A generator is said to be in an <i>undefined state</i> if it
 cannot be determined exactly how many values it has generated.
 This arises because it is impossible to tell by inspecting a
-generator whether it is exhausted or not.  For example,
+generator whether it is exhausted.  For example,
 <code>(generator-fold + 0 (generator 1 2 3) (generator 1 2))</code>
 will compute 0 + 1 + 1 + 2 + 2 = 6, at which time the second
 generator will be exhausted.  If the first generator is invoked,
 however, it may return either 3 or an end-of-file object,
 depending on whether the implementation of <code>generator-fold</code>
-has invoked it or not.
+has invoked it.
 Therefore, the first generator is said to be in an undefined state.
 
 <p>After passing an end-of-file object to an accumulator, it is an
@@ -402,7 +402,7 @@ generator.
 <dt><code>ggroup</code><i> gen k [ padding ]</i></dt>
 <dd><p>Returns a generator that yields lists of <i>k</i> items from the given
 generator.
-If less than <i>k</i> elements are available for the last list, and <i>padding</i>
+If fewer than <i>k</i> elements are available for the last list, and <i>padding</i>
 is absent, the short list is returned; otherwise, it is padded by <i>padding</i>
 to length <i>k</i>.
 </p>
@@ -464,7 +464,7 @@ generators is exhausted, at which time all the others are in an undefined state.
 <dl>
 <dt><code>gfilter</code><i> pred gen</i></dt>
 <dt><code>gremove</code><i> pred gen</i></dt>
-<dd><p>Return generators that yield the items from the source generator,
+<dd><p>Returns generators that yield the items from the source generator,
 except those on which <var>pred</var> answers false or true respectively.
 </p></dd></dl>
 
