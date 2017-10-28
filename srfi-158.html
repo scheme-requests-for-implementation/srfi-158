@@ -153,7 +153,6 @@ Therefore, the first generator is said to be in an undefined state.
 error to pass anything but another end-of-file object.  However,
 end-of-file objects may be passed repeatedly, and always produce
 the same result.</p>
-</p>
 
 <h2 class="subsection">Generator constructors</h2>
 
@@ -290,10 +289,6 @@ is the <var>start</var>-th element, and it ends right before the <var>end</var>-
 </dd></dl>
 
 <dl>
-
-</p></dd></dl>
-
-<dl>
 <dt><code>make-for-each-generator</code><i> for-each obj</i></dt>
 <dd><p>A generator constructor that converts any collection <var>obj</var> to
 a generator that returns its elements using a
@@ -369,7 +364,6 @@ tail-call <var>gen</var>.
 </dd></dl>
 
 <dl>
-<dl>
 <dt><code>gappend</code><i> gen …</i></dt>
 <dd><p>Returns a generator that yields the items from the first given
 generator, and once it is exhausted, from the second generator, and so on.
@@ -383,14 +377,12 @@ generator, and once it is exhausted, from the second generator, and so on.
 </dd></dl>
 
 <dl>
-<dl>
 <dt><code>gflatten</code><i> gen</i></dt>
 <dd><p>Returns a generator that yields the elements of the lists produced by the given
 generator.
 </p>
 </dd></dl>
 
-<dl>
 <dl>
 <dt><code>ggroup</code><i> gen k [ padding ]</i></dt>
 <dd><p>Returns a generator that yields lists of <i>k</i> items from the given
@@ -417,7 +409,6 @@ As a special case, if only one generator is given, it is returned.
 
 
 <dl>
-<dl>
 <dt><code>gmap</code><i> proc gen</i></dt>
 <dd><p>Returns a generator that yields the items from the given
 generator after invoking <i>proc</i> on them.
@@ -436,7 +427,6 @@ while <code>gmap</code> returns a generator immediately without consuming input.
 </pre></td></tr></tbody></table>
 </dd></dl>
 
-<dl>
 <dl>
 <dt><code>gcombine</code><i> proc seed gen gen<sub>2</sub> …</i></dt>
 <dd><p>A generator for
@@ -812,6 +802,7 @@ accumulation.  It is an error to try to accumulate more bytes than
 However, if an end-of-file object is passed, the accumulator returns <i>bytevector</i>.
 </p></dd></dl>
 
+<dl>
 <dt><code>sum-accumulator</code> </dt>
 <dd><p>Returns an accumulator that, when invoked on a number,
 adds that number to a sum inside the accumulator in order of
