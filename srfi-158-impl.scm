@@ -415,12 +415,6 @@
           (truth value)
           (else (loop (value-gen) (truth-gen)))))))))
 
-;; gpath
-(define (gpath gen . components)
-  (if (null? components)
-    gen
-    (apply gpath ((car components) gen) (cdr components))))
-
 ;; generator->list
 (define generator->list
   (case-lambda ((gen n)

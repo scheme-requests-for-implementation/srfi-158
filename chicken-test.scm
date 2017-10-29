@@ -136,11 +136,6 @@
               (lambda (item state) (values (even? state) (+ 1 state)))
               0
               (generator 'a 'b 'c 'd 'e 'f 'g 'h 'i 'j))))
-    (test '("-1" "-2" "-3" "-4" "-5")
-               (generator->list
-                 (gpath (generator 1 2 3 4 5)
-                        (lambda (gen) (gmap - gen))
-                        (lambda (gen) (gmap number->string gen)))))
   ) ; end "generators/operators"
 
 
