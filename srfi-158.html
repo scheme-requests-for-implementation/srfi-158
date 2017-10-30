@@ -411,8 +411,14 @@ As a special case, if only one generator is given, it is returned.
 
 <dl>
 <dt><code>gmap</code><i> proc gen1 gen2 ...</i></dt>
-<dd><p>Returns a generator that yields the items from the given
+<dd><p>When only one generator is given,
+returns a generator that yields the items from the given
 generator after invoking <i>proc</i> on them.
+</p>
+<p>When more than one generator is given, each item of the resulting
+generator is a result of applying <i>proc</i> on the items from
+each generators.  If any of input generator is exhausted, the resulting
+generator is also exhausted.
 </p>
 <p>
 Note: This differs from <code>generator-map->list</code>,
