@@ -51,7 +51,7 @@ that works as a sink of values.
 <h1>Rationale</h1>
 
 <p>The main purpose of generators is high performance.  Although
-<a href="http://srfi.schemers.org/srfi-41/srfi-41.html">SRFI 41</a>
+<a href="https://srfi.schemers.org/srfi-41/srfi-41.html">SRFI 41</a>
 streams can do everything generators can do and more,
 SRFI 41 uses lazy pairs that require making a thunk for every item.
 Generators can generate items without consing, so they are
@@ -59,7 +59,7 @@ very lightweight and are useful for implementing simple
 on-demand calculations.</p>
 
 <p>Existing examples of generators are readers from the current input port 
-and <a href="http://srfi.schemers.org/srfi-27/srfi-27.html">SRFI 27</a>
+and <a href="https://srfi.schemers.org/srfi-27/srfi-27.html">SRFI 27</a>
 random numbers.
 If Scheme had streams as one of its built-in
 abstractions, these would have been naturally represented by
@@ -323,7 +323,7 @@ the digits of an integer from least to most significant:</p>
 
 <dl>
 <dt><code>make-unfold-generator</code><i> stop? mapper successor seed</i></dt>
-<dd><p>A generator constructor similar to <a href="http://srfi.schemers.org/srfi-1/srfi-1.html">
+<dd><p>A generator constructor similar to <a href="https://srfi.schemers.org/srfi-1/srfi-1.html">
 SRFI 1's</a> <code>unfold</code>.
 </p>
 <p>The <var>stop?</var> predicate takes a seed value and determines
@@ -704,8 +704,8 @@ are unfolded into the collection that <var>unfold</var> creates.
 <p>The signature of the <var>unfold</var> procedure is <code>(</code><var>unfold stop? mapper successor seed args ...</var><code>)</code>.
 Note that the
 <code>vector-unfold</code> and <code>vector-unfold-right</code> 
-of <a href="http://srfi.schemers.org/srfi-43/srfi-43.html">SRFI 43</a>
-and <a href="http://srfi.schemers.org/srfi-133/srfi-133.html">SRFI 133</a>
+of <a href="https://srfi.schemers.org/srfi-43/srfi-43.html">SRFI 43</a>
+and <a href="https://srfi.schemers.org/srfi-133/srfi-133.html">SRFI 133</a>
 do not have this signature and cannot be used with this procedure.
 To unfold into a vector, use SRFI 1's <code>unfold</code> and then apply <code>list-&gt;vector</code>
 to the result.
