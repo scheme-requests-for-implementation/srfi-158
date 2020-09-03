@@ -27,8 +27,11 @@ Shiro Kawai, John Cowan, Thomas Gilray
   <li>Finalized: 2017-10-27</li>
   <li>Revised to fix errata:
     <ul>
-      <li>2017-10-29 (Fixed description of <code>gmap</code>.)</li></ul></li>
-</ul>
+      <li>2017-10-29 (Fixed description of <code>gmap</code>.)</li>
+      <li>2020-09-02
+	<ol>
+	  <li>The <code>gdelete</code> description talks about two generated values being compared, but that never happens.  What is compared are the item to be deleted and one generated value.</li>
+	  <li>The <code>gindex</code> description says it's an error if any index is larger than the number of available values.  In fact, that's just one way to reach the end of the resultant generator; there is nothing erroneous about it.</li></ol></li></ul></li></ul>
 
 <h1>Abstract</h1>
 
