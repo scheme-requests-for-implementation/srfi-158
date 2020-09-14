@@ -157,6 +157,7 @@
       (generator-map->list (lambda values (apply + values))
         (generator 1 4) (generator 2 5) (generator 3 6)))
     (test 3 (generator-find (lambda (x) (> x 2)) (make-range-generator 1 5)))
+    (test #f (generator-find (lambda (x) (> x 10)) (make-range-generator 1 5)))
     (test 2 (generator-count odd? (make-range-generator 1 5)))
     (define g (make-range-generator 2 5))
     (test #t (generator-any odd? g))
