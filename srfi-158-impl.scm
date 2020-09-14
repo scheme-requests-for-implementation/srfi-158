@@ -486,11 +486,9 @@
 ;; generator-find
 (define (generator-find pred g)
   (let loop ((v (g)))
-   ; A literal interpretation might say it only terminates on #eof if (pred #eof) but I think this makes more sense...
-   (if (or (pred v) (eof-object? v))
-     v
-     (loop (g)))))
-
+    (cond ((eof-object? v) #f)
+          ((pred v) v)
+          (else (loop (g))))))
 
 ;; generator-count
 (define (generator-count pred g)
