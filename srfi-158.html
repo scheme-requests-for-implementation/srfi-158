@@ -665,11 +665,9 @@ accumulated into a list, which is returned.
 
 <dl>
 <dt><code>generator-find</code><i> pred gen</i></dt>
-<dd><p>Returns the first item from the generator <var>gen</var> that satisfies
-the predicate <var>pred</var>, or <code>#f</code> if no such item is found before
-<var>gen</var> is exhausted.
-If <var>gen</var> is infinite, <code>generator-find</code> will not return
-if it cannot find an appropriate item.
+<dd><p>Applies <var>pred</var> to each item from <var>gen</var>.
+As soon as it yields a true value, the item is returned without consuming the rest of <var>gen</var>.
+If <var>gen</var> is exhausted, returns <code>#f</code>.
 </p></dd></dl>
 
 <dl>
