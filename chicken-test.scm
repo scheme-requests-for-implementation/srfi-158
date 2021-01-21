@@ -163,8 +163,13 @@
     (test #t (generator-any odd? g))
     (test '(4) (generator->list g))
     (define g (make-range-generator 2 5))
+    (test 3 (generator-any (lambda (x) (and (odd? x) x)) g))
+    (define g (make-range-generator 2 5))
     (test #f (generator-every odd? g))
     (test '(3 4) (generator->list g))
+    (define g (make-range-generator 2 5))
+    (test 4 (generator-every (lambda (x) (and (> x 1) x)) g))
+    (test '() (generator->list g))
     (test '(#\a #\b #\c) (generator-unfold (make-for-each-generator string-for-each "abc") unfold))
 
   ) ; end "generators/consumers"

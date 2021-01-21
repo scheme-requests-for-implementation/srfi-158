@@ -496,24 +496,22 @@
 
 
 ;; generator-any
-(define (generator-any pred g)
-  (let loop ((v (g)))
-   (if (eof-object? v)
-     #f
-     (if (pred v)
-       #t
-       (loop (g))))))
+(define (generator-any pred gen)
+  (let loop ((item (gen)))
+    (cond ((eof-object? item) #f)
+          ((pred item))
+          (else (loop (gen))))))
 
 
 ;; generator-every
-(define (generator-every pred g)
-  (let loop ((v (g)))
-   (if (eof-object? v)
-     #t
-     (if (pred v)
-       (loop (g))
-       #f ; the spec would have me return #f, but I think it must simply be wrong...
-       ))))
+(define (generator-every pred gen)
+  (let loop ((item (gen)) (last #t))
+    (if (eof-object? item)
+      last
+      (let ((r (pred item)))
+        (if r
+          (loop (gen) r)
+          #f)))))
 
 
 ;; generator-unfold
