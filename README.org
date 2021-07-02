@@ -6,6 +6,8 @@
 
 keywords: [[https://srfi.schemers.org/?keywords=data-structure][Data Structure]], [[https://srfi.schemers.org/?keywords=r7rs-large][R7RS Large]], [[https://srfi.schemers.org/?keywords=r7rs-large-tangerine][R7RS Large: Tangerine Edition]]
 
+library-name: generators-and-accumulators
+
 This repository hosts [[https://srfi.schemers.org/srfi-158/][SRFI 158]]: Generators and Accumulators, a [[https://srfi.schemers.org/][Scheme Request for Implementation]].
 
 This SRFI is in /final/ status.
